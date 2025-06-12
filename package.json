@@ -21,6 +21,7 @@
         "@fortawesome/free-brands-svg-icons": "^6.7.2",
         "@fortawesome/free-regular-svg-icons": "^6.7.2",
         "@fortawesome/free-solid-svg-icons": "^6.7.2",
+        "@ngrx/signals": "^19.2.1",
         "@tailwindcss/postcss": "^4.1.10",
         "daisyui": "^5.0.43",
         "postcss": "^8.5.5",
@@ -44,5 +45,11 @@
         "karma-jasmine-html-reporter": "~2.1.0",
         "typescript": "~5.8.2",
         "typescript-eslint": "8.33.1"
+    },
+    "overrides": {
+        "@ngrx/signals": {
+            "@angular/common": "$@angular/common",
+            "@angular/core": "$@angular/core"
+        }
     }
 }
