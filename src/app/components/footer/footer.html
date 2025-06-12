@@ -1,0 +1,18 @@
+<footer class="fixed bottom-0 left-0 w-full bg-base-200 border-t border-base-300 z-50 p-2">
+    <form [formGroup]="messageForm" class="max-w-2xl mx-auto flex items-center px-4 py-2 gap-2" (ngSubmit)="sendMessage()">
+        <button type="button" class="btn btn-ghost btn-circle text-xl">
+            <fa-icon [icon]="faSmile" />
+        </button>
+        <input
+            type="text"
+            placeholder="Type a message..."
+            class="input input-bordered flex-1"
+            name="message"
+            formControlName="message"
+            required
+        />
+        <button type="submit" class="btn btn-primary btn-circle text-xl">
+            <fa-icon [icon]="faPaperPlane" />
+        </button>
+    </form>
+</footer>

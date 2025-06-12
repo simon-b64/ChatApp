@@ -1,0 +1,11 @@
+<div #messagesContainer class="max-w-2xl mx-auto py-4 flex flex-col gap-2 max-h-[95vh] overflow-auto">
+    @for (message of messageStore.messages(); track message.timestamp) {
+        <div class="chat chat-end">
+            <div class="chat-bubble chat-bubble-primary">
+                <span class="font-bold">{{ message.author }}:</span>
+                <span class="ml-2">{{ message.content }}</span>
+                <div class="text-xs opacity-60 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
+            </div>
+        </div>
+    }
+</div>
