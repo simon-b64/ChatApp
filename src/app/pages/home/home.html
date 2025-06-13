@@ -1,11 +1,33 @@
-<div #messagesContainer class="max-w-2xl mx-auto py-4 flex flex-col gap-2 max-h-[95vh] overflow-auto">
-    @for (message of messageStore.messages(); track message.timestamp) {
-        <div class="chat chat-end">
-            <div class="chat-bubble chat-bubble-primary">
-                <span class="font-bold">{{ message.author }}:</span>
-                <span class="ml-2">{{ message.content }}</span>
-                <div class="text-xs opacity-60 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
-            </div>
+<div class="h-[100vh] w-[100vw] flex flex-col items-center">
+    <div #messagesContainer class="grow w-full  overflow-auto">
+        <div class="max-w-2xl mx-auto py-4 flex flex-col gap-2">
+            @for (message of messageStore.messages(); track message.timestamp) {
+                <div class="chat chat-end">
+                    <div class="chat-bubble chat-bubble-primary">
+                        <span class="font-bold">{{ message.author }}:</span>
+                        <span class="ml-2">{{ message.content }}</span>
+                        <div class="text-xs opacity-60 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
+                    </div>
+                </div>
+            }
         </div>
-    }
+    </div>
+    <div class="max-h-[5vh] w-full bg-base-200 border-t border-base-300 z-50">
+        <form [formGroup]="messageForm" class="max-w-2xl mx-auto flex items-center px-4 py-2 gap-2" (ngSubmit)="sendMessage()">
+            <button type="button" class="btn btn-ghost btn-circle text-xl">
+                <fa-icon [icon]="faSmile" />
+            </button>
+            <input
+                type="text"
+                placeholder="Type a message..."
+                class="input input-bordered flex-1"
+                name="message"
+                formControlName="message"
+                required
+            />
+            <button type="submit" class="btn btn-primary btn-circle text-xl">
+                <fa-icon [icon]="faPaperPlane" />
+            </button>
+        </form>
+    </div>
 </div>
