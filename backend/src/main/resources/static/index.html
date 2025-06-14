@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SockJS STOMP Client</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/bundles/stomp.umd.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #log { background: #f0f0f0; padding: 10px; height: 200px; overflow-y: auto; white-space: pre-wrap; border: 1px solid #ccc; margin-bottom: 10px; }
+        input, button { margin: 5px 0; padding: 8px; }
+        #status { margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h2>STOMP over SockJS Client</h2>
+
+<div id="status">Status: 🔴 Disconnected</div>
+
+<label>WebSocket URL:</label><br>
+<input type="text" id="ws-url" value="http://localhost:8080/chat-api/v1/ws" size="50"><br>
+
+<label>Subscribe to Topic:</label><br>
+<input type="text" id="topic" value="/topic/chat" size="50"><br>
+
+<label>Send Message To:</label><br>
+<input type="text" id="send-destination" value="/app/addUser" size="50"><br>
+
+<button id="connect-btn">Connect</button>
+<button id="disconnect-btn" disabled>Disconnect</button>
+
+<div id="log"></div>
+
+<input type="text" id="message" placeholder="Message to send" size="50">
+<button id="send-btn" disabled>Send</button>
+
+<script>
+    let stompClient = null;
+
+    const log = msg => {
+        const logEl = document.getElementById('log');
+        logEl.textContent += msg + '\n';
+        logEl.scrollTop = logEl.scrollHeight;
+    };
+
+    const setStatus = connected => {
+        document.getElementById('status').textContent = connected
+            ? 'Status: 🟢 Connected'
+            : 'Status: 🔴 Disconnected';
+        document.getElementById('connect-btn').disabled = connected;
+        document.getElementById('disconnect-btn').disabled = !connected;
+        document.getElementById('send-btn').disabled = !connected;
+    };
+
+    document.getElementById('connect-btn').onclick = () => {
+        const url = document.getElementById('ws-url').value;
+        const topic = document.getElementById('topic').value;
+
+        stompClient = new StompJs.Client({
+            webSocketFactory: () => new SockJS(url),
+            reconnectDelay: 5000,
+            debug: (str) => console.log(str)
+        });
+
+        stompClient.onConnect = () => {
+            setStatus(true);
+            log('✅ Connected to ' + url);
+            stompClient.subscribe(topic, message => {
+                log('📨 Received on ' + topic + ': ' + message.body);
+            });
+            log('📡 Subscribed to: ' + topic);
+        };
+
+        stompClient.onWebSocketClose = () => {
+            setStatus(false);
+            log('❌ Connection closed');
+        };
+
+        stompClient.activate();
+    };
+
+    document.getElementById('disconnect-btn').onclick = () => {
+        if (stompClient) {
+            stompClient.deactivate();
+            setStatus(false);
+            log('🔌 Disconnected');
+        }
+    };
+
+    document.getElementById('send-btn').onclick = () => {
+        const message = document.getElementById('message').value;
+        const destination = document.getElementById('send-destination').value;
+        if (stompClient && message.trim() !== '' && destination.trim() !== '') {
+            stompClient.publish({
+                destination: destination,
+                body: message
+            });
+            log('📤 Sent to ' + destination + ': ' + message);
+        }
+    };
+</script>
+
+</body>
+</html>
