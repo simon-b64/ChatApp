@@ -1,21 +1,20 @@
 import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
-
-export interface Message {
-    content: string;
-    author: string;
-    timestamp: Date;
-}
+import {MessageDto} from '../model/messageDto';
 
 export const MessageStore = signalStore(
-    { providedIn: 'root' },
+    {providedIn: 'root'},
     withState({
-        messages: [] as Message[],
+        username: undefined as string | undefined,
+        messages: [] as MessageDto[],
     }),
     withMethods((store) => {
         return {
-            appendMessage(message: Message) {
-                patchState(store, { messages: [...store.messages(), message] });
-            }
+            appendMessage(message: MessageDto) {
+                patchState(store, {messages: [...store.messages(), message]});
+            },
+            setUsername(username: string) {
+                patchState(store, {username});
+            },
         }
     })
-)
+);

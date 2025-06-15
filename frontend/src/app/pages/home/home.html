@@ -2,13 +2,27 @@
     <div #messagesContainer class="grow w-full  overflow-auto">
         <div class="max-w-2xl mx-auto py-4 flex flex-col gap-2">
             @for (message of messageStore.messages(); track message.timestamp) {
-                <div class="chat chat-end">
-                    <div class="chat-bubble chat-bubble-primary">
-                        <span class="font-bold">{{ message.author }}:</span>
-                        <span class="ml-2">{{ message.content }}</span>
-                        <div class="text-xs opacity-60 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
-                    </div>
-                </div>
+                @switch (message.type) {
+                    @case (MessageType.CHAT) {
+                        <div class="chat chat-end">
+                            <div class="chat-bubble chat-bubble-primary">
+                                <span class="font-bold">{{ message.username }}:</span>
+                                <span class="ml-2">{{ message.content }}</span>
+                                <div class="text-xs opacity-60 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
+                            </div>
+                        </div>
+                    }
+                    @case (MessageType.JOIN) {
+                        <div class="w-full text-center my-2">
+                            <span class="text-green-600 font-semibold">{{ message.username }} joined the chat</span>
+                        </div>
+                    }
+                    @case (MessageType.LEAVE) {
+                        <div class="w-full text-center my-2">
+                            <span class="text-red-600 font-semibold">{{ message.username }} left the chat</span>
+                        </div>
+                    }
+                }
             }
         </div>
     </div>
