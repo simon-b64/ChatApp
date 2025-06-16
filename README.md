@@ -12,9 +12,6 @@ A modern, full-stack chat application built with Java (Spring Boot) for the back
 - 🔒 Secure authentication
 - 🗂️ Multi-room support
 
-## TODO:
-- Add mobile safe zones
-
 ## Tech Stack
 
 - **Frontend:** Angular 20, TypeScript, RxJS
