@@ -21,8 +21,8 @@
 <label>WebSocket URL:</label><br>
 <input type="text" id="ws-url" value="http://localhost:8080/chat-api/v1/ws" size="50"><br>
 
-<label>Subscribe to Topic:</label><br>
-<input type="text" id="topic" value="/topic/chat" size="50"><br>
+<label>Subscribe to Topic(s) (comma separated):</label><br>
+<input type="text" id="topic" value="/topic/chat,/topic/alerts" size="50"><br>
 
 <label>Send Message To:</label><br>
 <input type="text" id="send-destination" value="/app/addUser" size="50"><br>
@@ -55,7 +55,6 @@
 
     document.getElementById('connect-btn').onclick = () => {
         const url = document.getElementById('ws-url').value;
-        const topic = document.getElementById('topic').value;
 
         stompClient = new StompJs.Client({
             webSocketFactory: () => new SockJS(url),
@@ -66,10 +65,16 @@
         stompClient.onConnect = () => {
             setStatus(true);
             log('✅ Connected to ' + url);
-            stompClient.subscribe(topic, message => {
-                log('📨 Received on ' + topic + ': ' + message.body);
+
+            const topicInput = document.getElementById('topic').value;
+            const topics = topicInput.split(',').map(t => t.trim()).filter(t => t);
+
+            topics.forEach(topic => {
+                stompClient.subscribe(topic, message => {
+                    log('📨 Received on ' + topic + ': ' + message.body);
+                });
+                log('📡 Subscribed to: ' + topic);
             });
-            log('📡 Subscribed to: ' + topic);
         };
 
         stompClient.onWebSocketClose = () => {

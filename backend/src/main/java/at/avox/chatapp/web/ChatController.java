@@ -11,8 +11,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.time.OffsetDateTime;
 
 @Controller
@@ -20,6 +22,7 @@ import java.time.OffsetDateTime;
 public class ChatController {
 
     private final ChatappProperties chatappProperties;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/sendMessage")
     @SendTo("/topic/chat")
@@ -44,7 +47,11 @@ public class ChatController {
 
     @MessageMapping("/addUser")
     @SendTo("/topic/chat")
-    public ChatMessageDto addUser(@Valid @Payload ChatRegistrationDto registrationDto, SimpMessageHeaderAccessor headerAccessor) {
+    public ChatMessageDto addUser(
+        @Valid @Payload ChatRegistrationDto registrationDto,
+        Principal principal,
+        SimpMessageHeaderAccessor headerAccessor
+    ) {
         var sessionAttributes = headerAccessor.getSessionAttributes();
 
         if (sessionAttributes == null) {
@@ -54,6 +61,12 @@ public class ChatController {
         if(sessionAttributes.containsKey(chatappProperties.getUsernameSessionAttribute())) {
             throw new IllegalStateException("User is already authenticated!");
         }
+
+        messagingTemplate.convertAndSendToUser(
+            principal.getName(),
+            "/queue/reply",
+            "Welcome to the chat, " + registrationDto.username() + "!"
+        );
 
         sessionAttributes.put(chatappProperties.getUsernameSessionAttribute(), registrationDto.username());
         return ChatMessageDto.builder()

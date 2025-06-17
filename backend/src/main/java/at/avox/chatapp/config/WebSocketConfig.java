@@ -13,13 +13,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat-api/v1/ws")
-            .setAllowedOriginPatterns("https://chat-app.avox.at")
+            .setAllowedOriginPatterns("https://chat-app.avox.at", "*")
+            .addInterceptors(new CustomHandshakeInterceptor())
+            .setHandshakeHandler(new CustomHandshakeHandler())
             .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/topic");
+        registry.setUserDestinationPrefix("/user");
+        registry.enableSimpleBroker("/topic", "/queue");
     }
 }
